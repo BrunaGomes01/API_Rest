@@ -2,14 +2,15 @@ const express= require('express')
 const bcrypt = require('bcryptjs')
 const jwt= require('jsonwebtoken')
 const crypto= require('crypto')
-const authConfig= require('../../config/auth.json')
 const User= require('../models/user')
 const mailer= require('../../modules/mailer')
+require('dotenv/config')
+
 
 const router= express.Router()
 
 function generateToken(params= {}){
-   return jwt.sign(params, authConfig.secret, {expiresIn: 86400})
+   return jwt.sign(params, process.env.SECRET_TOKEN, {expiresIn: 86400})
 }
 
 router.post('/register', async(req, res)=>{
@@ -58,10 +59,12 @@ router.post('/authenticate', async(req,res)=>{
 
 router.post('/forgot_password', async(req, res)=>{
     const {email}= req.body
+    
 
     try{
 
         const user= await User.findOne({email})
+        
 
         if(!user){
             return res.status(400).send({error: 'User not found'})
